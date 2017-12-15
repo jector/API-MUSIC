@@ -21,7 +21,7 @@ function saveUser(req, res){
 	console.log(params);
 
 	user.name = params.name;
-	user.surname = params.name;
+	user.surname = params.surname;
 	user.email = params.email;
 	user.role = 'ROLE_USER';
 	user.image = null;
@@ -96,12 +96,16 @@ function updateUser(req, res){
 	var userId = req.params.id;
 	var update = req.body;
 
+	if( userId != req.user.sub){
+		return res.status(500).send({message: 'You do not have permission to update this user'});
+	}
+
 	User.findByIdAndUpdate(userId, update, (err, updateUser) => {
 		if(err){
 			res.status(500).send({message: 'Error user update'});
 		}else{
 			if(!updateUser){
-				res.status(404).send({message: 'User can not update'});
+				res.status(200).send({message: 'User can not update'});
 			}else{
 				res.status(200).send({user: updateUser});
 			}
